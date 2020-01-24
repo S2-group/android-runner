@@ -37,7 +37,9 @@ def load_json(path):
     try:
         with open(path, 'r') as f:
             try:
-                return expand_paths(json.loads(f.read(), object_pairs_hook=OrderedDict))
+                config = expand_paths(json.loads(f.read(), object_pairs_hook=OrderedDict))
+                if os.getenv("DEBUG", False): print(config)
+                return config
             except ValueError:
                 raise FileFormatError(path)
     except IOError as e:
