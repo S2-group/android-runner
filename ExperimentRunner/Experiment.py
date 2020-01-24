@@ -22,7 +22,7 @@ class Experiment(object):
         if 'devices' not in config:
             raise ConfigError('"device" is required in the configuration')
         adb_path = config.get('adb_path', 'adb')
-        self.devices = Devices(config['devices'], adb_path=adb_path)
+        self.devices = Devices(config['devices'], adb_path=adb_path, devices_spec=config.get('devices_spec'))
         self.replications = Tests.is_integer(config.get('replications', 1))
         self.paths = config.get('paths', [])
         self.profilers = Profilers(config.get('profilers', {}))

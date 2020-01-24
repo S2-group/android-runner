@@ -18,12 +18,26 @@ class FileFormatError(Exception):
     pass
 
 
+def expand_paths(config):
+    if isinstance(config, dict):
+        for key in config:
+            config[key] = expand_paths(config[key])
+    elif isinstance(config, list):
+        for i in range(len(config)):
+            config[i] = expand_paths(config[i])
+    elif isinstance(config, unicode) or isinstance(config, str):
+        if config.startswith('~'):
+            config = os.path.expanduser(config)
+
+    return config
+                
+
 def load_json(path):
     """Load a JSON file from path, and returns an ordered dictionary or throws exceptions on formatting errors"""
     try:
         with open(path, 'r') as f:
             try:
-                return json.loads(f.read(), object_pairs_hook=OrderedDict)
+                return expand_paths(json.loads(f.read(), object_pairs_hook=OrderedDict))
             except ValueError:
                 raise FileFormatError(path)
     except IOError as e:
