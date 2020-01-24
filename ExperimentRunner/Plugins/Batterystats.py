@@ -6,6 +6,7 @@ import os.path as op
 import subprocess
 import time
 from collections import OrderedDict
+from util import load_json
 
 import BatterystatsParser
 from ExperimentRunner.BrowserFactory import BrowserFactory
@@ -23,7 +24,7 @@ class Batterystats(Profiler):
 
         # "config" only passes the fields under "profilers", so config.json is loaded again for the fields below
         # FIX
-        config_f = self.load_json(op.join(self.paths["CONFIG_DIR"], self.paths['ORIGINAL_CONFIG_DIR']))
+        config_f = load_json(op.join(self.paths["CONFIG_DIR"], self.paths['ORIGINAL_CONFIG_DIR']))
         self.type = config_f['type']
         self.systrace = config_f.get('systrace_path', 'systrace')
         self.powerprofile = config_f['powerprofile_path']
@@ -235,21 +236,6 @@ class Batterystats(Profiler):
         if number < minimum:
             raise ConfigError('%s should be equal or larger than %i' % (number, minimum))
         return number
-
-    @staticmethod
-    def load_json(path):
-        """Load a JSON file from path, and returns an ordered dictionary or throws exceptions on formatting errors"""
-        try:
-            with open(path, 'r') as f:
-                try:
-                    return json.loads(f.read(), object_pairs_hook=OrderedDict)
-                except ValueError:
-                    raise FileFormatError(path)
-        except IOError as e:
-            if e.errno == errno.ENOENT:
-                raise FileNotFoundError(path)
-            else:
-                raise e
 
 
 class FileNotFoundError(Exception):
