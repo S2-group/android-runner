@@ -22,6 +22,10 @@ class Batterystats(Profiler):
         self.profile = False
         self.cleanup = config.get('cleanup')
 
+        # Compatibility
+        if 'type' not in full_config:
+            full_config = load_json(op.join(self.paths["CONFIG_DIR"], self.paths['ORIGINAL_CONFIG_DIR']))
+
         self.type = full_config['type']
         self.systrace = full_config.get('systrace_path', 'systrace')
         self.powerprofile = full_config['powerprofile_path']

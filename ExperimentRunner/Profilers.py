@@ -6,13 +6,13 @@ from PluginHandler import PluginHandler
 
 class Profilers(object):
 
-    def __init__(self, config):
+    def __init__(self, config, full_config={}):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.profilers = []
         self.loaded_devices = []
         for name, params in config.items():
             try:
-                self.profilers.append(PluginHandler(name, params, config))
+                self.profilers.append(PluginHandler(name, params, full_config))
             except ImportError:
                 self.logger.error('Cannot import %s' % name)
                 raise

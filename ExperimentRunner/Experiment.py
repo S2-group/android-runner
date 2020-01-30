@@ -25,7 +25,7 @@ class Experiment(object):
         self.devices = Devices(config['devices'], adb_path=adb_path, devices_spec=config.get('devices_spec'))
         self.replications = Tests.is_integer(config.get('replications', 1))
         self.paths = config.get('paths', [])
-        self.profilers = Profilers(config.get('profilers', {}))
+        self.profilers = Profilers(config.get('profilers', {}), config)
         monkeyrunner_path = config.get('monkeyrunner_path', 'monkeyrunner')
         self.scripts = Scripts(config.get('scripts', {}), monkeyrunner_path=monkeyrunner_path)
         self.time_between_run = Tests.is_integer(config.get('time_between_run', 0))
