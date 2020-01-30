@@ -23,7 +23,7 @@ def main():
         progress_file = ' No progress file created'
 
     try:
-        experiment = ExperimentFactory.from_json(config_file, progress)
+        experiment = ExperimentFactory.from_json(config_file, progress, args)
         progress_file = experiment.get_progress_xml_file()
         experiment.start()
     except Exception, e:
@@ -53,6 +53,7 @@ def parse_arguments(args):
     parser = argparse.ArgumentParser()
     parser.add_argument('file')
     parser.add_argument('--progress', default=argparse.SUPPRESS)
+    parser.add_argument('--test', action='store_true')
     return vars(parser.parse_args(args))
 
 

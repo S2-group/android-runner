@@ -18,11 +18,18 @@ class ExperimentFactory(object):
         pass
 
     @staticmethod
-    def from_json(path, progress):
+    def from_json(path, progress, args={}):
         """Returns an Experiment object from a JSON configuration"""
         logger.info(path)
         shutil.copy(path, op.join(paths.OUTPUT_DIR, 'config.json'))
         config = util.load_json(path)
+
+        if "test" in args and args["test"]:
+            config['duration'] = 1000
+            config['time_between_run'] = 1000
+            config['replications'] = 1
+            print("Test mode enabled, duration and time between run changed to one second and replications to 1.")
+
         experiment_type = config['type']
         if experiment_type == 'plugintest':
             return PluginTests(config)
