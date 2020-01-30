@@ -25,8 +25,8 @@ class ExperimentFactory(object):
         config = util.load_json(path)
 
         if "test" in args and args["test"]:
-            config['duration'] = 1000
-            config['time_between_run'] = 1000
+            config['duration'] = 6000
+            config['time_between_run'] = 100
             config['replications'] = 1
             print("Test mode enabled, duration and time between run changed to one second and replications to 1.")
 
