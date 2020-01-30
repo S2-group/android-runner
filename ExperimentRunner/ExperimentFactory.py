@@ -24,8 +24,8 @@ class ExperimentFactory(object):
         shutil.copy(path, op.join(paths.OUTPUT_DIR, 'config.json'))
         config = util.load_json(path)
 
-        if "test" in args and args["test"]:
-            config['duration'] = 6000
+        if "test" in args and args["test"] > 0:
+            config['duration'] = args["test"]
             config['time_between_run'] = 1000
             config['replications'] = 1
             print("Test mode enabled (dureation: %d, time_between_run: %d, replications: %d)" %(config['duration'], config['time_between_run'], config['replications'] ))

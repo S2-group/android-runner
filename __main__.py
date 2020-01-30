@@ -16,7 +16,7 @@ def main():
     config_file = op.abspath(args['file'])
     setup_paths(config_file, log_dir)
     logger = setup_logger(log_dir)
-
+    print(args)
     try:
         progress_file = progress.get_progress_xml_file()
     except Exception:
@@ -53,7 +53,7 @@ def parse_arguments(args):
     parser = argparse.ArgumentParser()
     parser.add_argument('file')
     parser.add_argument('--progress', default=argparse.SUPPRESS)
-    parser.add_argument('--test', action='store_true')
+    parser.add_argument('--test', type=int, default=0)
     return vars(parser.parse_args(args))
 
 
