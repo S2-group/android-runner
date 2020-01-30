@@ -10,7 +10,7 @@ from util import makedirs
 
 
 class PluginHandler(object):
-    def __init__(self, name, params):
+    def __init__(self, name, params, full_config={}):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.pluginParams = params
         self.name = name
@@ -25,7 +25,7 @@ class PluginHandler(object):
             plugin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Plugins')
             self.plugin_source = self.plugin_base.make_plugin_source(searchpath=[plugin_path])
             self.pluginModule = self.plugin_source.load_plugin(self.moduleName)
-            self.currentProfiler = getattr(self.pluginModule, self.moduleName)(params, self.paths)
+            self.currentProfiler = getattr(self.pluginModule, self.moduleName)(params, self.paths, full_config)
             self.name = self.name_lower
         else:
             plugin_path = os.path.join(paths.CONFIG_DIR, 'Plugins')
@@ -34,7 +34,7 @@ class PluginHandler(object):
                     plugin_path, 'Profiler.py'))
                 self.plugin_source = self.plugin_base.make_plugin_source(searchpath=[plugin_path])
                 self.pluginModule = self.plugin_source.load_plugin(self.name)
-                self.currentProfiler = getattr(self.pluginModule, self.name)(params, self.paths)
+                self.currentProfiler = getattr(self.pluginModule, self.name)(params, self.paths, full_config)
             else:
                 raise ImportError
         self.logger.debug('%s: Initialized' % self.name)

@@ -12,7 +12,7 @@ class Profilers(object):
         self.loaded_devices = []
         for name, params in config.items():
             try:
-                self.profilers.append(PluginHandler(name, params))
+                self.profilers.append(PluginHandler(name, params, config))
             except ImportError:
                 self.logger.error('Cannot import %s' % name)
                 raise

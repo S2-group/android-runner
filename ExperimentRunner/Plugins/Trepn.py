@@ -18,7 +18,7 @@ class Trepn(Profiler):
     def dependencies(self):
         return ['com.quicinc.trepn']
 
-    def __init__(self, config, paths):
+    def __init__(self, config, paths, full_config={}):
         super(Trepn, self).__init__(config, paths)
         self.output_dir = ''
         self.paths = paths

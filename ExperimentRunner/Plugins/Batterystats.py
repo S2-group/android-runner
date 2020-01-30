@@ -15,23 +15,19 @@ from Profiler import Profiler
 
 class Batterystats(Profiler):
 
-    def __init__(self, config, paths):
+    def __init__(self, config, paths, full_config={}):
         super(Batterystats, self).__init__(config, paths)
         self.output_dir = ''
         self.paths = paths
         self.profile = False
         self.cleanup = config.get('cleanup')
 
-        print(config)
-        # "config" only passes the fields under "profilers", so config.json is loaded again for the fields below
-        # FIX
-        config_f = load_json(op.join(self.paths["CONFIG_DIR"], self.paths['ORIGINAL_CONFIG_DIR']))
-        self.type = config_f['type']
-        self.systrace = config_f.get('systrace_path', 'systrace')
-        self.powerprofile = config_f['powerprofile_path']
-        self.duration = self.is_integer(config_f.get('duration', 0)) / 1000
+        self.type = full_config['type']
+        self.systrace = full_config.get('systrace_path', 'systrace')
+        self.powerprofile = full_config['powerprofile_path']
+        self.duration = self.is_integer(full_config.get('duration', 0)) / 1000
         if self.type == 'web':
-            self.browsers = [BrowserFactory.get_browser(b)(config_f) for b in config_f.get('browsers', ['chrome'])]
+            self.browsers = [BrowserFactory.get_browser(b)(full_config) for b in full_config.get('browsers', ['chrome'])]
 
     # noinspection PyGlobalUndefined
     def start_profiling(self, device, **kwargs):
