@@ -22,6 +22,7 @@ class Batterystats(Profiler):
         self.profile = False
         self.cleanup = config.get('cleanup')
 
+        print(config)
         # "config" only passes the fields under "profilers", so config.json is loaded again for the fields below
         # FIX
         config_f = load_json(op.join(self.paths["CONFIG_DIR"], self.paths['ORIGINAL_CONFIG_DIR']))

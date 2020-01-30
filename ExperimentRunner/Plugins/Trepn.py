@@ -5,6 +5,7 @@ import os
 import os.path as op
 import time
 from collections import OrderedDict
+from util import load_json
 
 import lxml.etree as et
 
@@ -44,7 +45,7 @@ class Trepn(Profiler):
 
         datapoints_file = et.parse(op.join(current_dir, 'trepn/data_points.xml'))
         dp_root = datapoints_file.getroot()
-        data_points_dict = self.load_json(op.join(current_dir, 'trepn/data_points.json'))
+        data_points_dict = load_json(op.join(current_dir, 'trepn/data_points.json'))
         for dp in params['data_points']:
             dp = str(data_points_dict[dp])
             self.data_points.append(dp)
@@ -250,22 +251,6 @@ class Trepn(Profiler):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-
-    @staticmethod
-    def load_json(path):
-        """Load a JSON file from path, and returns an ordered dictionary or throws exceptions on formatting errors"""
-        try:
-            with open(path, 'r') as f:
-                try:
-                    return json.loads(f.read(), object_pairs_hook=OrderedDict)
-                except ValueError:
-                    raise FileFormatError(path)
-        except IOError as e:
-            if e.errno == errno.ENOENT:
-                raise FileNotFoundError(path)
-            else:
-                raise e
-
 
 class FileNotFoundError(Exception):
     def __init__(self, filename):
