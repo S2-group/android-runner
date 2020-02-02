@@ -33,8 +33,26 @@ python android_runner your_config.json
 Example configuration files can be found in the subdirectories of the `example` directory.
 
 ## Structure
+### Paths
+To prevent user specific paths inside of `your_config.json` replace your user subpath with `~/`. 
+
+For example: `/home/user/Android/Sdk/platform-tools/systrace/systrace.py` becomes `~/Android/Sdk/platform-tools/systrace/systrace.py`.
+
 ### devices.json
 A JSON config that maps devices names to their ADB ids for easy reference in config files.
+
+Specify **device_spec** inside of your config to specify a devices.json outside of the android-runner repository. For example:
+```
+{
+  ....
+  "type": "native",
+  "devices_spec": "~/experiments/devices.json",
+  "devices": {
+    "nexus6p": {}
+  },
+  ...
+}
+```
 
 ### Experiment Configuration
 Below is a reference to the fields for the experiment configuration. It is not always updated.
@@ -212,6 +230,13 @@ To test your own profiler, you can make use of the 'plugintest' experiment type 
 In case of an error or a user abort during experiment execution, it is possible to continue the experiment if desired. This is possible by using a ```--progress``` tag with the starting command. For example:
 
 ```python android_runner your_config.json --progress path/to/progress.xml```
+
+## Test runs
+In order to perform test runs with `your_config.json` add the `--test N` flag to the starting command, where `N` is the desired duration of the test run. For example:
+
+```python android_runner your_config.json --test N```
+
+This will override the `time_between_run`, `duration` and `replications` specified in `your_config.json` to `1000`, `N` and `1` respectively. This allows you to perform quick tests of your configs without needing to change anything within the config file itself.
 
 ## Detailed documentation
 The original thesis can be found here:
