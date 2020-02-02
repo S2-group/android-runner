@@ -16,7 +16,7 @@ def main():
     config_file = op.abspath(args['file'])
     setup_paths(config_file, log_dir)
     logger = setup_logger(log_dir)
-    print(args)
+    
     try:
         progress_file = progress.get_progress_xml_file()
     except Exception:
