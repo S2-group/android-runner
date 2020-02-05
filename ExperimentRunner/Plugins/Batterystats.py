@@ -134,7 +134,11 @@ class Batterystats(Profiler):
         self.pull_logcat(device)
         batterystats_results = self.get_batterystats_results(device)
         energy_consumed_j = self.get_consumed_joules(device)
-        systrace_results = self.get_systrace_results(device)
+        try:
+            systrace_results = self.get_systrace_results(device)
+        except Exception as e:
+            print("Systrace results parsing failed... (%s)"%(str(e)))
+            systrace_results = []
         self.write_results(batterystats_results, systrace_results, energy_consumed_j)
         self.cleanup_logs()
 

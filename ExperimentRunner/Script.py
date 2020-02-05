@@ -49,7 +49,7 @@ class Script(object):
         """Execute the script with respect to the termination conditions"""
         # https://stackoverflow.com/a/6286343
         with script_timeout(seconds=self.timeout):
-            processes = [] # type:mp.Process[]
+            processes = []
             try:
                 queue = mp.Queue()
                 processes.append(mp.Process(target=self.mp_run, args=(queue, device,) + args, kwargs=kwargs))
@@ -59,7 +59,7 @@ class Script(object):
                     p.start()
                 for p in processes:
                     p.join(self.timeout)
-                        
+
                 result = queue.get()
                 if isinstance(result, tuple):
                     name = result[0].__class__.__name__
