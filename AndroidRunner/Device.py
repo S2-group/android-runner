@@ -123,6 +123,12 @@ class Device:
         """Returns the current focused activity on the system"""
         # https://github.com/aldonin/appium-adb/blob/7b4ed3e7e2b384333bb85f8a2952a3083873a90e/lib/adb.js#L1278
         windows = Adb.shell(self.id, 'dumpsys window windows')
+
+        recent_activity = None
+        """Newer Android 10 does not have mCurrentFocus and mFocusedApp. Different approach to get the current activity"""
+        if self.get_version() == '10':
+            recent_activity = Adb.shell(self.id,'dumpsys activity recents | grep "Recent #0" | cut -d "=" -f2 | grep -o -p "[a-z|.]*"')
+
         null_re = r'mFocusedApp=null'
         # https://regex101.com/r/xZ8vF7/1
         current_focus_re = r'mCurrentFocus.+\s([^\s\/\}]+)\/[^\s\/\}]+(\.[^\s\/\}]+)}'
@@ -145,6 +151,10 @@ class Device:
         elif found_null:
             self.logger.debug('Current activity: null')
             return None
+        elif recent_activity:
+            result = recent_activity
+            self.logger.debug('Current activity: %s' % result)
+            return result
         else:
             self.logger.error('Results from dumpsys window windows: \n%s' % windows)
             raise AdbError('Could not parse activity from dumpsys')
