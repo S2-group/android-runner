@@ -1,0 +1,62 @@
+{
+  "_comment": "First TRUE automated hub-ctrl run: S2 Baseline on Pixel 9 over WiFi-ADB, with AR auto-cutting USB power via uhubctl per-cell. Pixel 9 is on outer hub 5-1.3.2 port 2 (post-2026-06-02 topology). usb_handler block tells AR to cut power before profiling starts and restore after. The test session survives because WiFi-ADB stays alive while USB-ADB drops with the power-cut. Run: cd android-runner && source .venv/bin/activate && python3 . examples/batterymanager/validation_s2_baseline_pixel9_wifi_hubctl.json",
+  "type": "native",
+  "adb_path": "/home/irena/Android/Sdk/platform-tools/adb",
+  "devices": {
+    "Pixel 9-W": {}
+  },
+  "repetitions": 1,
+  "interaction_covers_duration": true,
+  "paths": [
+    "/home/irena/Documents/Master Experiment/_external/android-apps-benchmark/APKs/Baseline/e.www.baseline.apk"
+  ],
+  "application_id": "e.www.baseline",
+  "duration": 60000,
+  "usb_handler": {
+    "enable_command": "sudo -n /usr/sbin/uhubctl -l 3-6.1 -p 1 -a 1",
+    "disable_command": "sudo -n /usr/sbin/uhubctl -l 3-6.1 -p 1 -a 0"
+  },
+  "profilers": {
+    "batterymanager": {
+      "experiment_aggregation": "default",
+      "sample_interval": 100,
+      "data_points": [
+        "BATTERY_PROPERTY_CURRENT_NOW",
+        "BATTERY_PROPERTY_CURRENT_AVERAGE",
+        "BATTERY_PROPERTY_STATUS",
+        "BATTERY_PROPERTY_CAPACITY",
+        "BATTERY_PROPERTY_CHARGE_COUNTER",
+        "EXTRA_VOLTAGE",
+        "EXTRA_TEMPERATURE"
+      ],
+      "persistency_strategy": [
+        "adb_log"
+      ]
+    },
+    "android": {
+      "sample_interval": 1000,
+      "data_points": [
+        "cpu",
+        "mem"
+      ]
+    },
+    "frametimes": {
+      "sample_interval": 1000,
+      "experiment_aggregation": "default"
+    },
+    "garbagecollection": {
+      "subject_aggregation": "default",
+      "experiment_aggregation": "default"
+    }
+  },
+  "scripts": {
+    "before_experiment": "Scripts/before_experiment_uninstall_s2_baseline.py",
+    "before_run": "Scripts/before_run.py",
+    "after_launch": "Scripts/after_launch.py",
+    "interaction": "Scripts/interaction_s2_baseline.py",
+    "before_close": "Scripts/before_close.py",
+    "after_run": "Scripts/after_run.py",
+    "after_experiment": "Scripts/after_experiment.py"
+  },
+  "time_between_run": 5000
+}

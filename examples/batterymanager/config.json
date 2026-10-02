@@ -13,7 +13,9 @@
       "experiment_aggregation": "default",
       "sample_interval": 100,
       "data_points": [
-        "BATTERY_PROPERTY_CURRENT_NOW", "EXTRA_VOLTAGE"
+        "BATTERY_PROPERTY_CURRENT_NOW",
+        "BATTERY_PROPERTY_STATUS",
+        "EXTRA_VOLTAGE"
       ],
       "persistency_strategy": [
         "adb_log"

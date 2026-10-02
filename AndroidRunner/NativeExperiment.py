@@ -13,7 +13,15 @@ class NativeExperiment(Experiment):
         self.autostart_subject = config.get('autostart_subject', True)
         self.experiment_args = config.get('experiment_args', [0]) # Just a single argument, if none are specified
         super(NativeExperiment, self).__init__(config, progress, restart)
+        # If True, the interaction script blocks for the full ``duration`` window itself (e.g. sysfs loop,
+        # or Appium subprocess hold — see interaction_appium_metronome.py). Skip the extra sleep below so
+        # the profiled window is not doubled.
+        self.interaction_covers_duration = bool(config.get('interaction_covers_duration', False))
         self.pre_installed_apps = config.get('apps', [])
+        # When installing from ``paths``, the runner otherwise derives the package name from the APK
+        # filename (splitext basename). Obfuscated or packed builds often use unrelated filenames;
+        # set ``application_id`` to the manifest packageName (e.g. com.bobek.metronome).
+        self.application_id = config.get('application_id')
         for apk in config.get('paths', []):
             if not op.isfile(apk):
                 raise ConfigError('File %s not found' % apk)
@@ -33,9 +41,10 @@ class NativeExperiment(Experiment):
         else:
             filename = op.basename(path)
             self.logger.info('APK: %s' % filename)
-            if filename not in device.get_app_list():
+            pkg = self.application_id or op.splitext(filename)[0]
+            if pkg not in device.get_app_list():
                 device.install(path)
-            self.package = op.splitext(op.basename(path))[0]
+            self.package = pkg
 
     def get_run_count(self):
         return self.repetitions * len(self.experiment_args)
@@ -53,7 +62,8 @@ class NativeExperiment(Experiment):
 
     def interaction(self, device, path, run, *args, **kwargs):
         super(NativeExperiment, self).interaction(device, path, run, *args, **kwargs)
-        time.sleep(self.duration)
+        if not self.interaction_covers_duration:
+            time.sleep(self.duration)
 
     def after_run(self, device, path, run, *args, **kwargs):
         self.before_close(device, path, run)

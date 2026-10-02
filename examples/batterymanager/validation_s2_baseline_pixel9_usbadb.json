@@ -1,0 +1,46 @@
+{
+  "_comment": "Epic 1 v4 \u2014 S2 Baseline on Pixel 9 over USB-ADB (NOT WiFi-ADB). Same as validation_s2_baseline_pixel9_wifi.json but uses the 'Pixel 9' alias (USB serial 56040DLAQ0027U) instead of 'Pixel 9-W'. Purpose: rule out WiFi-ADB transport as a cause of the v2 charge-controller inversion. If we get the same ~0.79x ratio here that we got in v2, the inversion is purely from the charge controller, not from data-transport choice. APK: S2-group Baseline (e.www.baseline).",
+  "type": "native",
+  "adb_path": "/home/irena/Android/Sdk/platform-tools/adb",
+  "devices": {
+    "Pixel 9": {}
+  },
+  "repetitions": 1,
+  "interaction_covers_duration": true,
+  "paths": [
+    "/home/irena/Documents/Master Experiment/_external/android-apps-benchmark/APKs/Baseline/e.www.baseline.apk"
+  ],
+  "application_id": "e.www.baseline",
+  "duration": 60000,
+  "profilers": {
+    "batterymanager": {
+      "experiment_aggregation": "default",
+      "sample_interval": 100,
+      "data_points": [
+        "BATTERY_PROPERTY_CURRENT_NOW",
+        "BATTERY_PROPERTY_STATUS",
+        "EXTRA_VOLTAGE"
+      ],
+      "persistency_strategy": [
+        "adb_log"
+      ]
+    },
+    "android": {
+      "sample_interval": 1000,
+      "data_points": [
+        "cpu",
+        "mem"
+      ]
+    }
+  },
+  "scripts": {
+    "before_experiment": "Scripts/before_experiment_uninstall_s2_baseline.py",
+    "before_run": "Scripts/before_run.py",
+    "after_launch": "Scripts/after_launch.py",
+    "interaction": "Scripts/interaction_s2_baseline.py",
+    "before_close": "Scripts/before_close.py",
+    "after_run": "Scripts/after_run.py",
+    "after_experiment": "Scripts/after_experiment.py"
+  },
+  "time_between_run": 5000
+}

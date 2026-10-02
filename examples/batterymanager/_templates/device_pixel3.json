@@ -1,0 +1,28 @@
+{
+  "_comment": "Pixel 3 device profile (Android 12 / API 31). ABI: ro.product.cpu.abilist == arm64-v8a,armeabi-v7a (both 64-bit and legacy 32-bit JNI libs install). BatteryManager: works directly via the BatteryManager companion app — no extra adb permission grant required, no sysfs fallback needed. Used as the canonical reference device for all energy comparisons. Use sysfs only if the BatteryManager companion is missing on this device.",
+  "device_name": "Pixel 3",
+  "device_serial_placeholder": "{{PIXEL3_SERIAL}}",
+  "android_version": "12",
+  "api_level": 31,
+  "abi": {
+    "primary": "arm64-v8a",
+    "all": ["arm64-v8a", "armeabi-v7a"],
+    "ro_product_cpu_abilist": "arm64-v8a,armeabi-v7a",
+    "accepts_armeabi_v7a_only_apks": true,
+    "accepts_arm64_v8a_only_apks": true
+  },
+  "energy": {
+    "preferred_source": "batterymanager",
+    "fallback_source": "sysfs",
+    "requires_battery_stats_grant": "consistency-only",
+    "battery_stats_grant_command": "adb -s {{PIXEL3_SERIAL}} shell pm grant com.example.batterymanager_utility android.permission.BATTERY_STATS",
+    "battery_stats_grant_changes_current_now": false,
+    "battery_stats_grant_changes_current_now_evidence": "Controlled A/B test 2026-05-08 evening (runs output/2026.05.08_203238 vs 203642): mean CURRENT_NOW differs by 8% within a within-run stdev of 63% — pure noise. AOSP <aosp>/frameworks/base/api/current.txt confirms BATTERY_PROPERTY_CURRENT_NOW (id=2) carries no @RequiresPermission(BATTERY_STATS) annotation; only properties 7-9 do.",
+    "requires_rebuilt_companion_apk": true,
+    "rebuilt_companion_apk_path": "_external/batterymanager-companion-fork/app/build/outputs/apk/debug/app-debug.apk",
+    "notes": "BatteryManager reads BATTERY_PROPERTY_CURRENT_NOW + EXTRA_VOLTAGE on Android 12 without any privileged permission. The grant is auto-applied by before_experiment as consistency hygiene only (so device_state.json carries the same battery_stats_granted=True across all 3 devices); it does NOT change the reading. Float-charge masking (§1b) is the actual measurement blocker on this device and only Epic 1.6 hub-ctrl can fix it."
+  },
+  "android_runner_devices_block": {
+    "Pixel 3": {}
+  }
+}

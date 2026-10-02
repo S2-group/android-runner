@@ -1,0 +1,31 @@
+{
+  "_comment": "Pixel 9 device profile (Android 15). CRITICAL ABI CONSTRAINT: ro.product.cpu.abilist == arm64-v8a only — Pixel 9 is 64-bit-only. APKs whose only JNI libraries live under lib/armeabi-v7a/ (e.g. some Bangcle-packed outputs) WILL fail with INSTALL_FAILED_NO_MATCHING_ABIS. This is an artifact-side mismatch, not a signing or adb bug; never weaken protection to force install — re-pack with arm64-v8a / fat-ABI shells, or mark the variant as not supported on Pixel 9 in final_dataset/. CRITICAL ENERGY CONSTRAINT: BatteryManager companion raises 'SecurityException: BATTERY_STATS permission' on Android 15. Mitigation: 'adb -s {{PIXEL9_SERIAL}} shell pm grant <package_name> android.permission.BATTERY_STATS'. If the grant is denied (privileged-permission policy), fall back to sysfs sampling for this device — never silently skip. Diagnostic checks: 'adb -s {{PIXEL9_SERIAL}} shell getprop ro.product.cpu.abilist' and 'unzip -l <protected-apk> | grep lib/' before declaring an install issue fixed.",
+  "device_name": "Pixel 9",
+  "device_serial_placeholder": "{{PIXEL9_SERIAL}}",
+  "android_version": "15",
+  "api_level": 35,
+  "abi": {
+    "primary": "arm64-v8a",
+    "all": ["arm64-v8a"],
+    "ro_product_cpu_abilist": "arm64-v8a",
+    "accepts_armeabi_v7a_only_apks": false,
+    "accepts_arm64_v8a_only_apks": true,
+    "incompatibility_error_when_violated": "INSTALL_FAILED_NO_MATCHING_ABIS"
+  },
+  "energy": {
+    "preferred_source": "batterymanager",
+    "fallback_source": "sysfs",
+    "requires_battery_stats_grant": "consistency-only",
+    "battery_stats_grant_command": "adb -s {{PIXEL9_SERIAL}} shell pm grant com.example.batterymanager_utility android.permission.BATTERY_STATS",
+    "battery_stats_grant_changes_current_now": false,
+    "battery_stats_grant_changes_current_now_evidence": "Verified 2026-05-08 evening on actual Pixel 9 (56040DLAQ0027U, Android 15): grant succeeds with rebuilt APK, granted=true (i.e. Android 15 does NOT tighten the development flag relative to Android 12; previously suspected to). AOSP source identical to Android 12 for CURRENT_NOW gating; no separate A/B test was run on Pixel 9 because the API path is the same.",
+    "requires_rebuilt_companion_apk": true,
+    "rebuilt_companion_apk_path": "_external/batterymanager-companion-fork/app/build/outputs/apk/debug/app-debug.apk",
+    "battery_stats_grant_failure_mode_with_upstream_apk": "SecurityException: Package com.example.batterymanager_utility has not requested permission android.permission.BATTERY_STATS — this is because the upstream S2-group APK doesn't declare the permission. Install the rebuilt fork APK from rebuilt_companion_apk_path and the grant will succeed.",
+    "fallback_decision_rule": "If 'pm grant' against the REBUILT fork APK is ever rejected (would be new — currently works on Android 12/13/15), switch this device to sysfs sampling. The grant is consistency hygiene only, not a measurement protection — sysfs vs BatteryManager doesn't change the float-charge masking (§1b) underlying problem.",
+    "notes": "Earlier 'BATTERY_STATS works on Android 15' afternoon claim is RETRACTED: the grant only succeeds with the rebuilt APK, and even then doesn't change CURRENT_NOW readings. See docs/MEASUREMENT_NOISE_SOURCES.md §1 evening retraction."
+  },
+  "android_runner_devices_block": {
+    "Pixel 9": {}
+  }
+}

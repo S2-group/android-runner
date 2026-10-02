@@ -185,7 +185,12 @@ class Batterymanager(Profiler):
 
     @staticmethod
     def trapezoid_method(df):
-        return np.trapz(df['power'].values, df['Timestamp'].values)
+        # NumPy 2.0+ renamed trapz to trapezoid; keep both for venvs on 1.x and 2.x
+        y, x = df['power'].values, df['Timestamp'].values
+        trapezoid = getattr(np, "trapezoid", None) or getattr(np, "trapz", None)
+        if trapezoid is None:
+            raise RuntimeError("NumPy trapezoidal integration API not found")
+        return trapezoid(y, x)
 
     @staticmethod
     def aggregate_batterymanager_runs(logs_dir):
@@ -211,7 +216,7 @@ class Batterymanager(Profiler):
 
             runs = pd.concat([runs, pd.DataFrame(stats, index=[0])], ignore_index=True)
 
-        runs = runs.drop(columns=['Timestamp', 'power'], axis=1)
+        runs = runs.drop(columns=['Timestamp', 'power'], errors='ignore')
         return runs
 
     @staticmethod

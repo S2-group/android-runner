@@ -1,0 +1,82 @@
+# Perfetto trace config for thesis multi-day sweep.
+# Captures: CPU scheduling (per-core utilization), Power Rails (per-subsystem
+# energy if the kernel exposes them on Pixel 9/6), battery counters.
+# Designed to be small (~5-10 MB per 120s cell).
+#
+# Spike 2026-06-30 — minimal config to validate Power Rails availability
+# on Pixel 9 / Pixel 6 / Pixel 3.
+
+# 60s buffer should hold ~120s of trace at ~50 MB/s = oversized; we round to 32 MB.
+buffers: {
+    size_kb: 32768
+    fill_policy: DISCARD
+}
+
+# Data source: ftrace — CPU scheduling, frequency, idle, irq
+data_sources: {
+    config {
+        name: "linux.ftrace"
+        target_buffer: 0
+        ftrace_config {
+            ftrace_events: "sched/sched_switch"
+            ftrace_events: "sched/sched_wakeup"
+            ftrace_events: "sched/sched_wakeup_new"
+            ftrace_events: "power/cpu_frequency"
+            ftrace_events: "power/cpu_idle"
+            ftrace_events: "power/suspend_resume"
+            ftrace_events: "power/clock_set_rate"
+            ftrace_events: "irq/irq_handler_entry"
+            ftrace_events: "irq/irq_handler_exit"
+        }
+    }
+}
+
+# Data source: process_stats — periodic snapshot of processes
+data_sources: {
+    config {
+        name: "linux.process_stats"
+        target_buffer: 0
+        process_stats_config {
+            scan_all_processes_on_start: true
+            proc_stats_poll_ms: 1000
+        }
+    }
+}
+
+# Data source: power/Power Rails — per-subsystem energy (CPU.big/medium/little,
+# GPU, DDR, modem, display). Pixel 9/6/3 expose these via the power_rail HAL.
+# If the kernel doesn't support it, this data source silently produces no data
+# (verified by trace_processor SQL query post-cell).
+data_sources: {
+    config {
+        name: "android.power"
+        target_buffer: 0
+        android_power_config {
+            battery_poll_ms: 1000
+            battery_counters: BATTERY_COUNTER_CAPACITY_PERCENT
+            battery_counters: BATTERY_COUNTER_CHARGE
+            battery_counters: BATTERY_COUNTER_CURRENT
+            battery_counters: BATTERY_COUNTER_CURRENT_AVG
+            collect_power_rails: true
+            collect_energy_estimation_breakdown: true
+        }
+    }
+}
+
+# Data source: surfaceflinger — frame events (replaces broken AR frametimes plugin)
+data_sources: {
+    config {
+        name: "android.surfaceflinger.frame"
+        target_buffer: 0
+    }
+}
+
+data_sources: {
+    config {
+        name: "android.surfaceflinger.frametimeline"
+        target_buffer: 0
+    }
+}
+
+# Stop trace after 130 s (workload is 120s; 10s extra for cleanup)
+duration_ms: 130000

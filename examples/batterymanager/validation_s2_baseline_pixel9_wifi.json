@@ -1,0 +1,46 @@
+{
+  "_comment": "Epic 1 (Measurement Validation Gate) \u2014 S2-group BASELINE app on Pixel 9 over WiFi-ADB. APK from https://github.com/S2-group/android-apps-benchmark APKs/Baseline/e.www.baseline.apk (cloned to _external/android-apps-benchmark/). The Baseline app's MainActivity is empty (just setContentView), so this measures the phone's baseline energy with a foreground Activity + screen on. Pairs with validation_s2_cpu_high_pixel9_wifi.json. No usb_handler block \u2014 hub adapter is dead, Pixel 9 is on WiFi-ADB only. Run command (from android-runner/ with venv active): python3 . examples/batterymanager/validation_s2_baseline_pixel9_wifi.json",
+  "type": "native",
+  "adb_path": "/home/irena/Android/Sdk/platform-tools/adb",
+  "devices": {
+    "Pixel 9-W": {}
+  },
+  "repetitions": 1,
+  "interaction_covers_duration": true,
+  "paths": [
+    "/home/irena/Documents/Master Experiment/_external/android-apps-benchmark/APKs/Baseline/e.www.baseline.apk"
+  ],
+  "application_id": "e.www.baseline",
+  "duration": 60000,
+  "profilers": {
+    "batterymanager": {
+      "experiment_aggregation": "default",
+      "sample_interval": 100,
+      "data_points": [
+        "BATTERY_PROPERTY_CURRENT_NOW",
+        "BATTERY_PROPERTY_STATUS",
+        "EXTRA_VOLTAGE"
+      ],
+      "persistency_strategy": [
+        "adb_log"
+      ]
+    },
+    "android": {
+      "sample_interval": 1000,
+      "data_points": [
+        "cpu",
+        "mem"
+      ]
+    }
+  },
+  "scripts": {
+    "before_experiment": "Scripts/before_experiment_uninstall_s2_baseline.py",
+    "before_run": "Scripts/before_run.py",
+    "after_launch": "Scripts/after_launch.py",
+    "interaction": "Scripts/interaction_s2_baseline.py",
+    "before_close": "Scripts/before_close.py",
+    "after_run": "Scripts/after_run.py",
+    "after_experiment": "Scripts/after_experiment.py"
+  },
+  "time_between_run": 5000
+}

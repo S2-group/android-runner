@@ -1,0 +1,28 @@
+{
+  "_comment": "Pixel 6 device profile. ABI: ro.product.cpu.abilist == arm64-v8a (64-bit only). BatteryManager works on this device. Some intermediate Android versions tighten BATTERY_STATS, so if the BatteryManager companion throws SecurityException run: 'adb -s <PIXEL6_SERIAL> shell pm grant <package_name> android.permission.BATTERY_STATS' (where <package_name> is the BatteryManager companion APK, e.g. com.example.batterymanager_utility). If that grant is rejected, fall back to sysfs sampling. APKs whose only JNI libs are under lib/armeabi-v7a/ will fail to install with INSTALL_FAILED_NO_MATCHING_ABIS — same constraint as Pixel 9.",
+  "device_name": "Pixel 6",
+  "device_serial_placeholder": "{{PIXEL6_SERIAL}}",
+  "android_version": "see-adb-shell-getprop-ro.build.version.release",
+  "api_level": null,
+  "abi": {
+    "primary": "arm64-v8a",
+    "all": ["arm64-v8a"],
+    "ro_product_cpu_abilist": "arm64-v8a",
+    "accepts_armeabi_v7a_only_apks": false,
+    "accepts_arm64_v8a_only_apks": true
+  },
+  "energy": {
+    "preferred_source": "batterymanager",
+    "fallback_source": "sysfs",
+    "requires_battery_stats_grant": "consistency-only",
+    "battery_stats_grant_command": "adb -s {{PIXEL6_SERIAL}} shell pm grant com.example.batterymanager_utility android.permission.BATTERY_STATS",
+    "battery_stats_grant_changes_current_now": false,
+    "battery_stats_grant_changes_current_now_evidence": "Verified 2026-05-08 evening on actual Pixel 6 (18131FDF6002S9, Android 13): grant succeeds with rebuilt APK, granted=true. AOSP source identical to Android 12/15 for CURRENT_NOW gating, so an A/B test would almost certainly show the same null effect as Pixel 3 (output/2026.05.08_203238 vs 203642).",
+    "requires_rebuilt_companion_apk": true,
+    "rebuilt_companion_apk_path": "_external/batterymanager-companion-fork/app/build/outputs/apk/debug/app-debug.apk",
+    "notes": "First Pixel 6 baseline (output/2026.05.08_210052) shows 100% positive current samples — same float-charge masking (§1b) as Pixel 3 / Pixel 9. The grant is consistency hygiene only, not a measurement protection. Hub-ctrl Epic 1.6 is the only canonical fix."
+  },
+  "android_runner_devices_block": {
+    "Pixel 6": {}
+  }
+}

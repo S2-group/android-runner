@@ -1,0 +1,46 @@
+{
+  "_comment": "Parametric Android Runner experiment template for the cross-device, cross-variant energy matrix. Materialize one concrete config per (app, variant, device) by substituting the 5 double-curly-brace placeholders defined below. Locked invariants: duration=120000ms (2 minutes), repetitions=3, interaction_covers_duration=true, time_between_run=5000. Materialized for app_id={{APP_ID}}, application_id={{APPLICATION_ID}}, apk_path={{APK_PATH}}, device={{DEVICE_NAME}}, interaction_hook={{INTERACTION_HOOK}}. Matches the structural reference monkey_espresso_mirror_2min_baseline.json (same profilers.batterymanager.* shape).",
+  "type": "native",
+  "adb_path": "/home/irena/Android/Sdk/platform-tools/adb",
+  "devices": {
+    "{{DEVICE_NAME}}": {}
+  },
+  "repetitions": 3,
+  "interaction_covers_duration": true,
+  "paths": [
+    "{{APK_PATH}}"
+  ],
+  "application_id": "{{APPLICATION_ID}}",
+  "duration": 120000,
+  "profilers": {
+    "batterymanager": {
+      "experiment_aggregation": "default",
+      "sample_interval": 100,
+      "data_points": [
+        "BATTERY_PROPERTY_CURRENT_NOW",
+        "EXTRA_VOLTAGE"
+      ],
+      "persistency_strategy": [
+        "adb_log"
+      ]
+    },
+    "android": {
+      "_comment": "E1.5.T1 + T2 — Android Runner's documented CPU + memory profiler (Plugins/android/Android.py, A-Mobile 2020 paper §3.4). Polls `dumpsys cpuinfo` (system TOTAL pct) and `dumpsys meminfo <package>` (subject app PSS in KB) every sample_interval ms. Outputs land at <run_id>/data/<device>/<subject>/android/<serial>_<ts>.csv. Aggregates via Scripts/aux_postprocess.py (avg/p50/p95/max into aux_summary.json) consumed by update_tracking_matrix.py.",
+      "sample_interval": 1000,
+      "data_points": [
+        "cpu",
+        "mem"
+      ]
+    }
+  },
+  "scripts": {
+    "before_experiment": "Scripts/before_experiment_uninstall_{{APP_ID}}.py",
+    "before_run": "Scripts/before_run.py",
+    "after_launch": "Scripts/after_launch.py",
+    "interaction": "{{INTERACTION_HOOK}}",
+    "before_close": "Scripts/before_close.py",
+    "after_run": "Scripts/after_run.py",
+    "after_experiment": "Scripts/after_experiment.py"
+  },
+  "time_between_run": 5000
+}

@@ -1,0 +1,62 @@
+{
+  "_comment": "[BASELINE-DEBUG variant, generated 2026-07-24, points to baseline_debug_canonical folder] | 2026-08-03: USB power switched via YKUSH3 (tools/ykush_ar_power.sh). Do NOT use uhubctl on this board \u2014 it disables the data port but leaves VBUS live, so the phone charges through the measurement.",
+  "type": "native",
+  "adb_path": "/home/irena/Android/Sdk/platform-tools/adb",
+  "devices": {
+    "Pixel 9-W": {}
+  },
+  "repetitions": 1,
+  "interaction_covers_duration": true,
+  "paths": [
+    "/home/irena/Documents/Master Thesis/APKs/bangcle_debug_canonical/androidskk_bangcle_debug.signed.apk"
+  ],
+  "application_id": "jp.deadend.noname.skk",
+  "duration": 150000,
+  "profilers": {
+    "batterymanager": {
+      "experiment_aggregation": "default",
+      "sample_interval": 100,
+      "data_points": [
+        "BATTERY_PROPERTY_CURRENT_NOW",
+        "BATTERY_PROPERTY_CURRENT_AVERAGE",
+        "BATTERY_PROPERTY_STATUS",
+        "BATTERY_PROPERTY_CAPACITY",
+        "BATTERY_PROPERTY_CHARGE_COUNTER",
+        "EXTRA_VOLTAGE",
+        "EXTRA_TEMPERATURE"
+      ],
+      "persistency_strategy": [
+        "adb_log"
+      ]
+    },
+    "android": {
+      "sample_interval": 1000,
+      "data_points": [
+        "cpu",
+        "mem"
+      ]
+    },
+    "frametimes": {
+      "sample_interval": 1000,
+      "experiment_aggregation": "default"
+    },
+    "garbagecollection": {
+      "subject_aggregation": "default",
+      "experiment_aggregation": "default"
+    }
+  },
+  "scripts": {
+    "before_experiment": "Scripts/before_experiment_uninstall_androidskk.py",
+    "before_run": "Scripts/before_run.py",
+    "after_launch": "Scripts/after_launch.py",
+    "interaction": "Scripts/interaction_appium_androidskk.py",
+    "before_close": "Scripts/before_close.py",
+    "after_run": "Scripts/after_run.py",
+    "after_experiment": "Scripts/after_experiment.py"
+  },
+  "time_between_run": 5000,
+  "usb_handler": {
+    "enable_command": "\"/home/irena/Documents/Master Experiment/tools/ykush_ar_power.sh\" pixel9 on",
+    "disable_command": "\"/home/irena/Documents/Master Experiment/tools/ykush_ar_power.sh\" pixel9 off"
+  }
+}

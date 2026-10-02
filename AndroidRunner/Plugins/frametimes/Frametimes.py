@@ -28,12 +28,47 @@ class Frametimes(Profiler):
         if 'No process found' in result:
             raise Exception('FrameTimes Profiler: {}'.format(result))
 
-        filteredResult = filter(lambda row: not row.startswith('Flags') and row != '---PROFILEDATA---', result.split())
+        # Android 14+ added 10 new framestats columns. Old format (14 cols):
+        # IntendedVsync at index 1, FrameCompleted at index 13. New format (24 cols):
+        # IntendedVsync at index 2, FrameCompleted at index 17. Hard-coding 1 and 13
+        # on newer Android picks FrameTimelineVsyncId (an ID, ~7 digits) and SyncQueued
+        # (a mid-frame timestamp), producing frame_time values of ~24 trillion ns —
+        # nonsense. Parse the header to find the right indices. Patched 2026-06-30.
+        lines = result.split('\n')
+        iv_idx, fc_idx = self._find_columns(lines)
 
-        return map(lambda stats: self.extract_frame_start_end(stats.split(',')), filteredResult)
+        filteredResult = filter(
+            lambda row: not row.startswith('Flags') and row != '---PROFILEDATA---' and row.strip(),
+            (line.strip() for line in lines),
+        )
 
-    def extract_frame_start_end(self, frame_times):
-        return [int(frame_times[1]), int(frame_times[13])]
+        return map(
+            lambda stats: self.extract_frame_start_end(stats.split(','), iv_idx, fc_idx),
+            filteredResult,
+        )
+
+    def _find_columns(self, lines):
+        """Locate IntendedVsync + FrameCompleted column indices from the header.
+
+        Returns (intended_vsync_idx, frame_completed_idx). Falls back to the legacy
+        (1, 13) if the header doesn't match — older Android or unrecognised format.
+        """
+        for line in lines:
+            line = line.strip()
+            if line.startswith('Flags,') and 'IntendedVsync' in line and 'FrameCompleted' in line:
+                cols = [c.strip() for c in line.split(',')]
+                try:
+                    return cols.index('IntendedVsync'), cols.index('FrameCompleted')
+                except ValueError:
+                    pass
+        # Legacy fallback (Android 13 and earlier)
+        return 1, 13
+
+    def extract_frame_start_end(self, frame_times, iv_idx=1, fc_idx=13):
+        try:
+            return [int(frame_times[iv_idx]), int(frame_times[fc_idx])]
+        except (IndexError, ValueError):
+            return [0, 0]
 
     def start_profiling(self, device, **kwargs):
         self.profile = True
